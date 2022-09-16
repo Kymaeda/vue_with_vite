@@ -1,45 +1,49 @@
 <script>
-import { ref, computed, reactive } from 'vue';
-const START_FROM = 10;
+import { ref, computed, reactive, watch } from 'vue';
+
+let timeout = null;
+
 export default {
-  // NOTE: OptionalAPI syntax
-  // data() {
-  //   return { counter: 0 }
-  // }
-  // computed: {
-  //   muplited() { return this.counter * 10 }
-  // }
   setup() {
-    // NOTE: `ref` works with Object and Primitive(wrapped with Object inside `ref` func), and call `reactive` internally
-    const counter = ref(72);
-    // NOTE: `reactive` works with only Object. Primitive is not acceptable
-    const tokyo = reactive({ counter: 10 });
+    const currentBalance = ref(0);
+    const inUSD = computed(() => (currentBalance.value * 1.14).toFixed(2));
 
-    const ra = ref([1, 2, 3]);
-    const replaceArray = () => (ra.value = [2, 4, 6]);
+    const sessionCounter = ref(0);
+    const history = ref([]);
+    const exchangeRecords = reactive({
+      highestBalance: null,
+    });
 
-    const muplited = computed(() => counter.value * 10);
-    const increment = () => counter.value++;
-    // NOTE: setup() needs to return values
-    return {
-      START_FROM,
-      counter,
-      tokyo,
-      ra,
-      replaceArray,
-      muplited,
-      increment,
-    };
+    // NOTE: do not `.value`
+    watch(currentBalance, (newValue, oldValue) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        sessionCounter.value++;
+        history.value.push(newValue);
+
+        if (currentBalance.value > exchangeRecords.highestBalance) {
+          exchangeRecords.highestBalance = currentBalance.value;
+        }
+      }, 500);
+    });
+    // NOTE: to watch array, need `.value`
+    watch(history.value, () => console.log('new history added...'));
+    // NOTE: A watch source can only be a getter/effect function, a ref, a reactive object, or an array of these types
+    // `() => exchangeRecords.highestBalance` works as getter function
+    watch(
+      () => exchangeRecords.highestBalance,
+      () => console.log('exhange record has changed...')
+    );
+
+    return { currentBalance, inUSD, sessionCounter, history, exchangeRecords };
   },
 };
 </script>
 
 <template>
-  <div>Hello! {{ counter }}</div>
-  <button @click="increment">Increase</button>
-
-  <button @click="replaceArray">Replace</button>
-  <div>{{ ra }}</div>
-
-  <div>{{ tokyo.counter }}</div>
+  <div>Money in Bank: {{ currentBalance }}</div>
+  <div>in US dolars: {{ inUSD }}</div>
+  <div>
+    <input type="text" v-model.number="currentBalance" />
+  </div>
 </template>
