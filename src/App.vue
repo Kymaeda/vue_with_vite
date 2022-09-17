@@ -8,7 +8,7 @@ export default {
   components: { Money },
   setup() {
     const currentBalance = ref(0);
-    const inUSD = computed(() => (currentBalance.value * 1.14).toFixed(2));
+    const inUSD = computed(() => (currentBalance.value * 1.14));
 
     const sessionCounter = ref(0);
     const history = ref([]);
@@ -17,7 +17,7 @@ export default {
     });
 
     // NOTE: do not `.value`
-    watch(currentBalance, (newValue, oldValue) => {
+    watch(currentBalance, (newValue, _oldValue) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         sessionCounter.value++;
