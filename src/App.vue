@@ -1,5 +1,5 @@
 <script>
-import { ref, computed, reactive, watch } from 'vue';
+import { ref, computed, reactive, watch, onMounted } from 'vue';
 import Money from './Money.vue';
 
 let timeout = null;
@@ -8,7 +8,7 @@ export default {
   components: { Money },
   setup() {
     const currentBalance = ref(0);
-    const inUSD = computed(() => (currentBalance.value * 1.14));
+    const inUSD = computed(() => currentBalance.value * rate.value);
 
     const sessionCounter = ref(0);
     const history = ref([]);
@@ -36,6 +36,14 @@ export default {
       () => exchangeRecords.highestBalance,
       () => console.log('exhange record has changed...')
     );
+
+    const rate = ref(1.14)
+    onMounted(
+      () => setInterval(
+        () => rate.value = [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)],
+        1000,
+      )
+    )
 
     return { currentBalance, inUSD, sessionCounter, history, exchangeRecords };
   },
