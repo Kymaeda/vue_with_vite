@@ -1,7 +1,8 @@
 import { ref } from 'vue';
 
+const rate = ref(1.14);
+
 export function useRate() {
-  const rate = ref(1.14)
   const setRate = (newRate) => rate.value = newRate
 
   return { rate, setRate }
