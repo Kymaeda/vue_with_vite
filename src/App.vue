@@ -13,7 +13,7 @@ export default {
     const currentBalance = ref(0);
     // const inUSD = computed(() => currentBalance.value * store.state.rate);
 
-    const { rate } = useRate();
+    const { rate, setRate } = useRate();
     const inUSD = computed(() => currentBalance.value * rate.value);
 
     const sessionCounter = ref(0);
@@ -45,7 +45,7 @@ export default {
 
     onMounted(() =>
       setInterval(
-        () => (rate.value = [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]),
+        () => (setRate([1.13, 1.14, 1.15][Math.floor(Math.random() * 3)])),
         // store.commit(
         //   'setRate',
         //   [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]
