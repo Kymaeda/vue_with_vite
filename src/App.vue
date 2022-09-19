@@ -1,14 +1,16 @@
 <script>
 import { ref, computed, reactive, watch, onMounted } from 'vue';
 import Money from './Money.vue';
+import { useStore } from 'vuex';
 
 let timeout = null;
 
 export default {
   components: { Money },
   setup() {
+    const store = useStore();
     const currentBalance = ref(0);
-    const inUSD = computed(() => currentBalance.value * rate.value);
+    const inUSD = computed(() => currentBalance.value * store.state.rate);
 
     const sessionCounter = ref(0);
     const history = ref([]);
@@ -37,13 +39,16 @@ export default {
       () => console.log('exhange record has changed...')
     );
 
-    const rate = ref(1.14)
-    onMounted(
-      () => setInterval(
-        () => rate.value = [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)],
-        1000,
+    onMounted(() =>
+      setInterval(
+        () =>
+          store.commit(
+            'setRate',
+            [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]
+          ),
+        1000
       )
-    )
+    );
 
     return { currentBalance, inUSD, sessionCounter, history, exchangeRecords };
   },
