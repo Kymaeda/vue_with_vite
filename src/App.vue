@@ -1,16 +1,20 @@
 <script>
 import { ref, computed, reactive, watch, onMounted } from 'vue';
 import Money from './Money.vue';
-import { useStore } from 'vuex';
+// import { useStore } from 'vuex';
+import { useRate } from './composable/useRate';
 
 let timeout = null;
 
 export default {
   components: { Money },
   setup() {
-    const store = useStore();
+    // const store = useStore();
     const currentBalance = ref(0);
-    const inUSD = computed(() => currentBalance.value * store.state.rate);
+    // const inUSD = computed(() => currentBalance.value * store.state.rate);
+
+    const { rate } = useRate();
+    const inUSD = computed(() => currentBalance.value * rate.value);
 
     const sessionCounter = ref(0);
     const history = ref([]);
@@ -41,11 +45,11 @@ export default {
 
     onMounted(() =>
       setInterval(
-        () =>
-          store.commit(
-            'setRate',
-            [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]
-          ),
+        () => (rate.value = [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]),
+        // store.commit(
+        //   'setRate',
+        //   [1.13, 1.14, 1.15][Math.floor(Math.random() * 3)]
+        // ),
         1000
       )
     );
